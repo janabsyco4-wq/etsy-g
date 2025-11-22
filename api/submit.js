@@ -143,6 +143,9 @@ function fallbackOptimization(formData) {
 // Save to Google Sheets
 async function saveToGoogleSheets(originalData, optimizedData) {
     try {
+        console.log('DEBUG: GOOGLE_SHEET_ID =', process.env.GOOGLE_SHEET_ID);
+        console.log('DEBUG: GOOGLE_CREDENTIALS exists?', !!process.env.GOOGLE_CREDENTIALS);
+        
         const auth = new google.auth.GoogleAuth({
             credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
             scopes: ['https://www.googleapis.com/auth/spreadsheets']
