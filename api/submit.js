@@ -43,8 +43,13 @@ module.exports = async (req, res) => {
         return res.status(200).json({
             success: true,
             optimizedTitle: optimizedData.title,
+            optimizedDescription: optimizedData.description,
+            seoScore: optimizedData.seoScore,
+            keywordSuggestions: optimizedData.keywordSuggestions,
+            competitorInsights: optimizedData.competitorInsights,
+            improvements: optimizedData.improvements,
             message: 'Product optimized and saved successfully!',
-            etsyUrl: '#', // Placeholder since we're not using Etsy
+            etsyUrl: '#',
             listingId: Date.now()
         });
         
@@ -67,17 +72,43 @@ async function optimizeWithAI(formData) {
 
         const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         
-        const prompt = `You are an Etsy SEO expert. Optimize this product listing.
+        // Advanced optimization mode (default: aggressive)
+        const mode = formData.optimizationMode || 'aggressive';
+        
+        const prompt = `You are an expert Etsy SEO consultant with 10+ years of experience. Analyze and optimize this product listing for maximum visibility and conversion.
 
-Original:
+ORIGINAL LISTING:
 Title: ${formData.title}
 Description: ${formData.description}
 Category: ${formData.category}
 Tags: ${formData.tags}
 Materials: ${formData.materials}
+Price: $${formData.price}
 
-Return ONLY a single JSON object (no array, no markdown):
-{"title":"SEO title max 140 chars","description":"detailed description","tags":["tag1","tag2","tag3"],"materials":["mat1","mat2"],"category":"category","improvements":"what changed"}`;
+OPTIMIZATION MODE: ${mode}
+- aggressive: Maximum SEO keywords, detailed descriptions, all 13 tags
+- moderate: Balanced approach, natural language with SEO
+- conservative: Minimal changes, keep original voice
+
+REQUIREMENTS:
+1. Title: Max 140 chars, include primary keywords, benefit-driven
+2. Description: 3-5 paragraphs, storytelling + features + benefits + CTA
+3. Tags: Exactly 13 tags, mix of broad and long-tail keywords
+4. SEO Score: Rate 0-100 based on keyword density, readability, completeness
+5. Keyword Suggestions: Top 5 trending keywords for this product type
+
+Return ONLY valid JSON (no markdown, no array):
+{
+  "title": "optimized title",
+  "description": "detailed multi-paragraph description",
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10", "tag11", "tag12", "tag13"],
+  "materials": ["material1", "material2"],
+  "category": "optimized category",
+  "improvements": "detailed explanation of changes",
+  "seoScore": 85,
+  "keywordSuggestions": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
+  "competitorInsights": "brief market analysis"
+}`;
 
         const result = await model.generateContent(prompt);
         const response = result.response;
@@ -109,6 +140,9 @@ Return ONLY a single JSON object (no array, no markdown):
             materials: optimized.materials,
             category: optimized.category,
             improvements: optimized.improvements,
+            seoScore: optimized.seoScore || 75,
+            keywordSuggestions: optimized.keywordSuggestions || [],
+            competitorInsights: optimized.competitorInsights || 'N/A',
             price: formData.price,
             quantity: formData.quantity,
             sku: formData.sku
@@ -154,7 +188,7 @@ async function saveToGoogleSheets(originalData, optimizedData) {
         const sheets = google.sheets({ version: 'v4', auth });
         const spreadsheetId = process.env.GOOGLE_SHEET_ID.trim();
         
-        // Prepare row data
+        // Prepare row data with new columns
         const row = [
             new Date().toISOString(),
             originalData.title || '',
@@ -170,13 +204,16 @@ async function saveToGoogleSheets(originalData, optimizedData) {
             originalData.price || '',
             originalData.quantity || '',
             originalData.sku || '',
-            optimizedData.improvements || ''
+            optimizedData.improvements || '',
+            optimizedData.seoScore || 0,
+            Array.isArray(optimizedData.keywordSuggestions) ? optimizedData.keywordSuggestions.join(', ') : '',
+            optimizedData.competitorInsights || ''
         ];
         
-        // Append to sheet
+        // Append to sheet (extended to column R for new fields)
         await sheets.spreadsheets.values.append({
             spreadsheetId,
-            range: 'Sheet1!A:O',
+            range: 'Sheet1!A:R',
             valueInputOption: 'RAW',
             resource: {
                 values: [row]
