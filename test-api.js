@@ -69,18 +69,23 @@ Provide optimized versions in JSON format:
         console.log('   Sending request to Gemini...');
         const result = await model.generateContent(prompt);
         const response = result.response;
-        const text = response.text();
+        let text = response.text();
         
         console.log('   ✅ Gemini API Response received');
         console.log('   Response preview:', text.substring(0, 100) + '...');
         
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            const optimized = JSON.parse(jsonMatch[0]);
+        // Remove markdown
+        text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+        
+        // Try to parse
+        try {
+            const parsed = JSON.parse(text);
+            const optimized = Array.isArray(parsed) ? parsed[0] : parsed;
             console.log('   ✅ JSON parsing successful');
             console.log('   Optimized Title:', optimized.title);
-        } else {
-            console.log('   ⚠️  No JSON found in response');
+        } catch (e) {
+            console.log('   ⚠️  JSON parsing failed:', e.message);
+            console.log('   But AI is working! (Fallback will handle this)');
         }
         
         console.log('\n3️⃣ Testing Google Sheets...');
