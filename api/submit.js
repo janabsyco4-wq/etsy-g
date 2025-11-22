@@ -59,9 +59,14 @@ module.exports = async (req, res) => {
 
 // AI Optimization using Google Gemini
 async function optimizeWithAI(formData) {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-    
-    const prompt = `You are an Etsy SEO expert. Optimize this product listing for maximum visibility and sales.
+    try {
+        if (!process.env.GEMINI_API_KEY) {
+            throw new Error('GEMINI_API_KEY not configured');
+        }
+
+        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+        
+        const prompt = `You are an Etsy SEO expert. Optimize this product listing for maximum visibility and sales.
 
 Original Data:
 - Title: ${formData.title}
@@ -80,29 +85,33 @@ Please provide optimized versions in JSON format:
   "improvements": "Brief note on what was improved"
 }`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    
-    // Extract JSON from response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-        throw new Error('AI did not return valid JSON');
+        const result = await model.generateContent(prompt);
+        const response = result.response;
+        const text = response.text();
+        
+        // Extract JSON from response
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error('AI did not return valid JSON');
+        }
+        
+        const optimized = JSON.parse(jsonMatch[0]);
+        
+        return {
+            title: optimized.title,
+            description: optimized.description,
+            tags: optimized.tags,
+            materials: optimized.materials,
+            category: optimized.category,
+            improvements: optimized.improvements,
+            price: formData.price,
+            quantity: formData.quantity,
+            sku: formData.sku
+        };
+    } catch (error) {
+        console.error('Gemini API Error:', error);
+        throw new Error('AI optimization failed: ' + error.message);
     }
-    
-    const optimized = JSON.parse(jsonMatch[0]);
-    
-    return {
-        title: optimized.title,
-        description: optimized.description,
-        tags: optimized.tags,
-        materials: optimized.materials,
-        category: optimized.category,
-        improvements: optimized.improvements,
-        price: formData.price,
-        quantity: formData.quantity,
-        sku: formData.sku
-    };
 }
 
 // Save to Google Sheets
