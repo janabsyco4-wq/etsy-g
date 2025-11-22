@@ -173,7 +173,7 @@ async function saveToGoogleSheets(originalData, optimizedData) {
         // Append to sheet
         await sheets.spreadsheets.values.append({
             spreadsheetId,
-            range: 'Sheet1!A:O',
+            range: 'etsy-listing!A:O',
             valueInputOption: 'RAW',
             resource: {
                 values: [row]
