@@ -152,7 +152,7 @@ async function saveToGoogleSheets(originalData, optimizedData) {
         });
         
         const sheets = google.sheets({ version: 'v4', auth });
-        const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+        const spreadsheetId = process.env.GOOGLE_SHEET_ID.trim();
         
         // Prepare row data
         const row = [
