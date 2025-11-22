@@ -3,108 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Etsy Listing Automation</title>
+    <title>Etsy AI Optimizer Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
+        
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
+        
         h1 {
-            color: #333;
+            color: #1e293b;
             margin-bottom: 10px;
-            font-size: 2em;
+            font-size: 2.2em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
+        
         .subtitle {
-            color: #666;
+            color: #64748b;
             margin-bottom: 30px;
-            font-size: 0.95em;
+            font-size: 1em;
         }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
         .form-group {
             margin-bottom: 20px;
         }
+        
         label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
+            color: #1e293b;
             font-weight: 600;
             font-size: 0.95em;
         }
-        input[type="text"],
-        input[type="number"],
-        textarea,
-        select {
+        
+        input, textarea, select {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #e2e8f0;
             border-radius: 8px;
             font-size: 14px;
-            transition: border-color 0.3s;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
         }
-        input:focus,
-        textarea:focus,
-        select:focus {
+        
+        input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
+        
         textarea {
             min-height: 100px;
             resize: vertical;
         }
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
+        
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: -9999px;
-        }
-        .file-input-label {
-            display: block;
+        
+        .mode-btn {
+            flex: 1;
             padding: 12px;
-            background: #f5f5f5;
-            border: 2px dashed #ccc;
+            border: 2px solid #e2e8f0;
+            background: white;
             border-radius: 8px;
-            text-align: center;
             cursor: pointer;
             transition: all 0.3s;
+            text-align: center;
         }
-        .file-input-label:hover {
-            background: #ebebeb;
+        
+        .mode-btn.active {
             border-color: #667eea;
+            background: #f0f4ff;
+            color: #667eea;
         }
-        .file-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .file-preview img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 2px solid #e0e0e0;
-        }
-        button {
+        
+        button.submit-btn {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -112,147 +136,453 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s;
         }
-        button:hover:not(:disabled) {
+        
+        button.submit-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
         }
-        button:disabled {
+        
+        button.submit-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
-        .status {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
+        
+        .loading-overlay {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        
+        .loading-overlay.active {
+            display: flex;
         }
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
         }
-        .status.loading {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
+        
         .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid rgba(0,0,0,0.1);
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #667eea;
             border-radius: 50%;
-            border-top-color: #0c5460;
-            animation: spin 1s ease-in-out infinite;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        .result-card {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+            border-radius: 12px;
+            border: 2px solid #667eea;
+        }
+        
+        .result-card.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .seo-score {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .score-high { background: #10b981; }
+        .score-medium { background: #f59e0b; }
+        .score-low { background: #ef4444; }
+        
+        .keyword-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .keyword-tag {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #667eea;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #667eea;
+        }
+        
+        .history-item {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .history-item h4 {
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        
+        .history-item p {
+            color: #64748b;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🛍️ Etsy Listing Automation</h1>
-        <p class="subtitle">AI-powered listing optimization with automatic publishing</p>
+        <h1>🚀 Etsy AI Optimizer Pro</h1>
+        <p class="subtitle">Advanced AI-powered listing optimization with SEO scoring & analytics</p>
         
-        <form id="listingForm">
-            <div class="form-group">
-                <label for="title">Product Title *</label>
-                <input type="text" id="title" name="title" required placeholder="e.g., Handmade Ceramic Coffee Mug">
-            </div>
-
-            <div class="form-group">
-                <label for="description">Description *</label>
-                <textarea id="description" name="description" required placeholder="Describe your product..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="images">Product Images * (Max 10)</label>
-                <div class="file-input-wrapper">
-                    <input type="file" id="images" name="images" accept="image/*" multiple required>
-                    <label for="images" class="file-input-label">
-                        📷 Click to upload images
-                    </label>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('create')">📝 Create Listing</button>
+            <button class="tab" onclick="switchTab('abtest')">🧪 A/B Testing</button>
+            <button class="tab" onclick="switchTab('history')">📊 History</button>
+            <button class="tab" onclick="switchTab('analytics')">📈 Analytics</button>
+        </div>
+        
+        <!-- Create Listing Tab -->
+        <div id="create-tab" class="tab-content active">
+            <div class="mode-selector">
+                <div class="mode-btn active" onclick="selectMode('aggressive')" id="mode-aggressive">
+                    <strong>🔥 Aggressive</strong><br>
+                    <small>Max SEO keywords</small>
                 </div>
-                <div class="file-preview" id="imagePreview"></div>
+                <div class="mode-btn" onclick="selectMode('moderate')" id="mode-moderate">
+                    <strong>⚖️ Moderate</strong><br>
+                    <small>Balanced approach</small>
+                </div>
+                <div class="mode-btn" onclick="selectMode('conservative')" id="mode-conservative">
+                    <strong>🎯 Conservative</strong><br>
+                    <small>Minimal changes</small>
+                </div>
             </div>
+            
+            <form id="listingForm">
+                <input type="hidden" id="optimizationMode" value="aggressive">
+                
+                <div class="form-group">
+                    <label for="title">Product Title *</label>
+                    <input type="text" id="title" required placeholder="e.g., Handmade Ceramic Coffee Mug">
+                </div>
 
-            <div class="form-group">
-                <label for="category">Category *</label>
-                <input type="text" id="category" name="category" required placeholder="e.g., Home & Living">
+                <div class="form-group">
+                    <label for="description">Description *</label>
+                    <textarea id="description" required placeholder="Describe your product..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <input type="text" id="category" required placeholder="e.g., Home & Living">
+                </div>
+
+                <div class="form-group">
+                    <label for="tags">Tags (comma-separated)</label>
+                    <input type="text" id="tags" placeholder="e.g., ceramic, handmade, coffee mug">
+                </div>
+
+                <div class="form-group">
+                    <label for="materials">Materials (comma-separated)</label>
+                    <input type="text" id="materials" placeholder="e.g., ceramic, glaze, clay">
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price (USD) *</label>
+                    <input type="number" id="price" step="0.01" required placeholder="29.99">
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Quantity *</label>
+                    <input type="number" id="quantity" required placeholder="10">
+                </div>
+
+                <div class="form-group">
+                    <label for="sku">SKU</label>
+                    <input type="text" id="sku" placeholder="e.g., MUG-001">
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    ✨ Optimize with AI
+                </button>
+            </form>
+            
+            <div id="result" class="result-card"></div>
+        </div>
+        
+        <!-- A/B Testing Tab -->
+        <div id="abtest-tab" class="tab-content">
+            <h3 style="margin-bottom: 20px;">🧪 A/B Testing - Compare 3 Variations</h3>
+            
+            <form id="abtestForm">
+                <div class="form-group">
+                    <label for="ab-title">Product Title *</label>
+                    <input type="text" id="ab-title" required placeholder="e.g., Handmade Ceramic Coffee Mug">
+                </div>
+
+                <div class="form-group">
+                    <label for="ab-description">Description *</label>
+                    <textarea id="ab-description" required placeholder="Describe your product..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="ab-category">Category *</label>
+                    <input type="text" id="ab-category" required placeholder="e.g., Home & Living">
+                </div>
+
+                <div class="form-group">
+                    <label for="ab-tags">Tags (comma-separated)</label>
+                    <input type="text" id="ab-tags" placeholder="e.g., ceramic, handmade, coffee mug">
+                </div>
+
+                <div class="form-group">
+                    <label for="ab-materials">Materials (comma-separated)</label>
+                    <input type="text" id="ab-materials" placeholder="e.g., ceramic, glaze, clay">
+                </div>
+
+                <div class="form-group">
+                    <label for="ab-price">Price (USD) *</label>
+                    <input type="number" id="ab-price" step="0.01" required placeholder="29.99">
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    🧪 Generate 3 Variations
+                </button>
+            </form>
+            
+            <div id="variations-result" style="display: none; margin-top: 30px;"></div>
+        </div>
+        
+        <!-- History Tab -->
+        <div id="history-tab" class="tab-content">
+            <h3 style="margin-bottom: 20px;">Recent Listings</h3>
+            <div id="history-list">
+                <p style="color: #64748b;">No listings yet. Create your first one!</p>
             </div>
-
-            <div class="form-group">
-                <label for="tags">Tags (comma-separated)</label>
-                <input type="text" id="tags" name="tags" placeholder="e.g., ceramic, handmade, coffee mug">
+        </div>
+        
+        <!-- Analytics Tab -->
+        <div id="analytics-tab" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Performance Analytics</h3>
+                <button onclick="exportToCSV()" style="width: auto; padding: 10px 20px; font-size: 14px;">
+                    📥 Export to CSV
+                </button>
             </div>
-
-            <div class="form-group">
-                <label for="materials">Materials (comma-separated)</label>
-                <input type="text" id="materials" name="materials" placeholder="e.g., ceramic, glaze, clay">
+            
+            <div id="analytics-content">
+                <div style="padding: 40px; text-align: center; color: #64748b;">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 20px;">Loading analytics...</p>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="price">Price (USD) *</label>
-                <input type="number" id="price" name="price" step="0.01" required placeholder="29.99">
-            </div>
-
-            <div class="form-group">
-                <label for="quantity">Quantity *</label>
-                <input type="number" id="quantity" name="quantity" required placeholder="10">
-            </div>
-
-            <div class="form-group">
-                <label for="sku">SKU</label>
-                <input type="text" id="sku" name="sku" placeholder="e.g., MUG-001">
-            </div>
-
-            <button type="submit" id="submitBtn">
-                🚀 Create Listing with AI Optimization
-            </button>
-        </form>
-
-        <div class="status" id="status"></div>
+        </div>
+    </div>
+    
+    <div id="loading" class="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3 style="color: #1e293b; margin-bottom: 10px;">Optimizing with AI...</h3>
+            <p style="color: #64748b;">This may take a few seconds</p>
+        </div>
     </div>
 
     <script>
-        const form = document.getElementById('listingForm');
-        const statusDiv = document.getElementById('status');
-        const submitBtn = document.getElementById('submitBtn');
-        const imageInput = document.getElementById('images');
-        const imagePreview = document.getElementById('imagePreview');
-
-        // Image preview
-        imageInput.addEventListener('change', function(e) {
-            imagePreview.innerHTML = '';
-            const files = Array.from(e.target.files);
-            files.slice(0, 10).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    imagePreview.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            });
-        });
-
-        form.addEventListener('submit', async (e) => {
+        let selectedMode = 'aggressive';
+        let history = JSON.parse(localStorage.getItem('listingHistory') || '[]');
+        let currentVariations = null;
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+            
+            if (tab === 'history') {
+                loadHistory();
+            } else if (tab === 'analytics') {
+                loadAnalytics();
+            }
+        }
+        
+        async function loadAnalytics() {
+            const content = document.getElementById('analytics-content');
+            content.innerHTML = '<div style="padding: 40px; text-align: center;"><div class="spinner"></div><p style="margin-top: 20px; color: #64748b;">Loading analytics...</p></div>';
+            
+            try {
+                const response = await fetch('/api/analytics');
+                const data = await response.json();
+                
+                if (!response.ok) throw new Error(data.error);
+                
+                const scoreColor = data.averageSeoScore >= 80 ? '#10b981' : data.averageSeoScore >= 60 ? '#f59e0b' : '#ef4444';
+                
+                content.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; color: white;">
+                            <h2 style="margin: 0; font-size: 36px;">${data.totalListings}</h2>
+                            <p style="margin: 5px 0 0 0; opacity: 0.9;">Total Listings</p>
+                        </div>
+                        <div style="background: ${scoreColor}; padding: 20px; border-radius: 12px; color: white;">
+                            <h2 style="margin: 0; font-size: 36px;">${data.averageSeoScore}</h2>
+                            <p style="margin: 5px 0 0 0; opacity: 0.9;">Avg SEO Score</p>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px; border-radius: 12px; color: white;">
+                            <h2 style="margin: 0; font-size: 36px;">${data.topKeywords.length}</h2>
+                            <p style="margin: 5px 0 0 0; opacity: 0.9;">Unique Keywords</p>
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 15px 0; color: #1e293b;">🔥 Top Keywords</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${data.topKeywords.map(k => `
+                                <span style="padding: 8px 16px; background: #f0f4ff; border: 1px solid #667eea; border-radius: 20px; font-size: 13px; color: #667eea;">
+                                    ${k.keyword} <strong>(${k.count})</strong>
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 15px 0; color: #1e293b;">📊 Category Breakdown</h4>
+                        ${Object.entries(data.categoryBreakdown).map(([cat, count]) => `
+                            <div style="margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="color: #64748b;">${cat}</span>
+                                    <strong style="color: #1e293b;">${count}</strong>
+                                </div>
+                                <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                                    <div style="background: #667eea; height: 100%; width: ${(count / data.totalListings * 100)}%;"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0;">
+                        <h4 style="margin: 0 0 15px 0; color: #1e293b;">📝 Recent Listings</h4>
+                        ${data.recentListings.map(item => `
+                            <div style="padding: 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #667eea;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <strong style="color: #1e293b;">${item.title}</strong>
+                                        <p style="margin: 5px 0 0 0; color: #64748b; font-size: 13px;">${item.category}</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 20px; font-weight: 700; color: ${item.seoScore >= 80 ? '#10b981' : item.seoScore >= 60 ? '#f59e0b' : '#ef4444'};">
+                                            ${item.seoScore}
+                                        </div>
+                                        <div style="font-size: 11px; color: #64748b;">SEO</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                content.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: #ef4444;">
+                        <p>❌ ${error.message}</p>
+                        <p style="margin-top: 10px; font-size: 14px; color: #64748b;">Create some listings first to see analytics.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function exportToCSV() {
+            try {
+                const response = await fetch('/api/export');
+                if (!response.ok) throw new Error('Export failed');
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'etsy-listings-' + new Date().toISOString().split('T')[0] + '.csv';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                alert('✅ CSV exported successfully!');
+            } catch (error) {
+                alert('❌ Export failed: ' + error.message);
+            }
+        }
+        
+        function selectMode(mode) {
+            selectedMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('mode-' + mode).classList.add('active');
+            document.getElementById('optimizationMode').value = mode;
+        }
+        
+        function loadHistory() {
+            const historyList = document.getElementById('history-list');
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="color: #64748b;">No listings yet. Create your first one!</p>';
+                return;
+            }
+            
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <h4>${item.title}</h4>
+                    <p>SEO Score: ${item.seoScore}/100 | ${new Date(item.date).toLocaleDateString()}</p>
+                </div>
+            `).join('');
+        }
+        
+        document.getElementById('listingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            submitBtn.disabled = true;
-            statusDiv.className = 'status loading';
-            statusDiv.style.display = 'block';
-            statusDiv.innerHTML = '<span class="spinner"></span> Processing your listing with AI...';
-
-            // Collect form data as JSON
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            loading.classList.add('active');
+            result.classList.remove('active');
+            
             const data = {
                 title: document.getElementById('title').value,
                 description: document.getElementById('description').value,
@@ -261,40 +591,227 @@
                 materials: document.getElementById('materials').value,
                 price: parseFloat(document.getElementById('price').value),
                 quantity: parseInt(document.getElementById('quantity').value),
-                sku: document.getElementById('sku').value
+                sku: document.getElementById('sku').value,
+                optimizationMode: selectedMode
             };
             
             try {
                 const response = await fetch('/api/submit', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
 
-                const result = await response.json();
+                const res = await response.json();
 
                 if (response.ok) {
-                    statusDiv.className = 'status success';
-                    statusDiv.innerHTML = `
-                        ✅ <strong>Success!</strong><br>
-                        Optimized Title: ${result.optimizedTitle}<br>
-                        Saved to Google Sheets ✓<br>
-                        Email notification sent ✓
+                    const scoreClass = res.seoScore >= 80 ? 'score-high' : res.seoScore >= 60 ? 'score-medium' : 'score-low';
+                    
+                    result.innerHTML = `
+                        <h3 style="color: #1e293b; margin-bottom: 20px;">✅ Optimization Complete!</h3>
+                        
+                        <div class="seo-score">
+                            <div class="score-circle ${scoreClass}">${res.seoScore}</div>
+                            <div>
+                                <strong style="color: #1e293b;">SEO Score</strong><br>
+                                <small style="color: #64748b;">Based on keywords, readability & completeness</small>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <strong style="color: #1e293b;">Optimized Title:</strong>
+                            <p style="color: #64748b; margin-top: 5px;">${res.optimizedTitle}</p>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <strong style="color: #1e293b;">🔍 Keyword Suggestions:</strong>
+                            <div class="keyword-tags">
+                                ${res.keywordSuggestions.map(k => `<span class="keyword-tag">${k}</span>`).join('')}
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <strong style="color: #1e293b;">📈 Market Insights:</strong>
+                            <p style="color: #64748b; margin-top: 5px;">${res.competitorInsights}</p>
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                            <small style="color: #64748b;">
+                                ✓ Saved to Google Sheets<br>
+                                ✓ Email notification sent<br>
+                                ✓ Ready for publishing
+                            </small>
+                        </div>
                     `;
-                    form.reset();
-                    imagePreview.innerHTML = '';
+                    
+                    result.classList.add('active');
+                    
+                    // Save to history
+                    history.unshift({
+                        title: res.optimizedTitle,
+                        seoScore: res.seoScore,
+                        date: new Date().toISOString()
+                    });
+                    history = history.slice(0, 10); // Keep last 10
+                    localStorage.setItem('listingHistory', JSON.stringify(history));
+                    
+                    // Reset form
+                    document.getElementById('listingForm').reset();
                 } else {
-                    throw new Error(result.error || 'Unknown error');
+                    throw new Error(res.error || 'Unknown error');
                 }
             } catch (error) {
-                statusDiv.className = 'status error';
-                statusDiv.innerHTML = `❌ <strong>Error:</strong> ${error.message}`;
+                result.innerHTML = `
+                    <h3 style="color: #ef4444;">❌ Error</h3>
+                    <p style="color: #64748b; margin-top: 10px;">${error.message}</p>
+                `;
+                result.classList.add('active');
             } finally {
-                submitBtn.disabled = false;
+                loading.classList.remove('active');
             }
         });
+        
+        // A/B Testing Form
+        document.getElementById('abtestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loading = document.getElementById('loading');
+            const variationsResult = document.getElementById('variations-result');
+            
+            loading.classList.add('active');
+            variationsResult.style.display = 'none';
+            
+            const data = {
+                title: document.getElementById('ab-title').value,
+                description: document.getElementById('ab-description').value,
+                category: document.getElementById('ab-category').value,
+                tags: document.getElementById('ab-tags').value,
+                materials: document.getElementById('ab-materials').value,
+                price: parseFloat(document.getElementById('ab-price').value),
+                quantity: 10,
+                sku: 'AB-TEST'
+            };
+            
+            try {
+                const response = await fetch('/api/ab-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const res = await response.json();
+
+                if (response.ok) {
+                    currentVariations = res.variations;
+                    
+                    variationsResult.innerHTML = `
+                        <h3 style="color: #1e293b; margin-bottom: 20px;">📊 Compare 3 Variations</h3>
+                        <p style="color: #64748b; margin-bottom: 20px;">Original: "${res.originalTitle}"</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            ${res.variations.map((v, i) => {
+                                const scoreColor = v.seoScore >= 80 ? '#10b981' : v.seoScore >= 60 ? '#f59e0b' : '#ef4444';
+                                return `
+                                    <div style="background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; position: relative;">
+                                        <div style="position: absolute; top: 15px; right: 15px; width: 50px; height: 50px; border-radius: 50%; background: ${scoreColor}; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">
+                                            ${v.seoScore}
+                                        </div>
+                                        
+                                        <h4 style="color: #667eea; margin: 0 0 5px 0;">Variation ${v.variation}</h4>
+                                        <p style="color: #64748b; font-size: 13px; margin: 0 0 15px 0;">${v.strategy}</p>
+                                        
+                                        <div style="margin-bottom: 15px;">
+                                            <strong style="color: #1e293b; font-size: 13px;">Title:</strong>
+                                            <p style="color: #64748b; font-size: 14px; margin: 5px 0;">${v.title}</p>
+                                        </div>
+                                        
+                                        <div style="margin-bottom: 15px;">
+                                            <strong style="color: #1e293b; font-size: 13px;">Description:</strong>
+                                            <p style="color: #64748b; font-size: 13px; margin: 5px 0; max-height: 100px; overflow-y: auto;">${v.description}</p>
+                                        </div>
+                                        
+                                        <div style="margin-bottom: 15px;">
+                                            <strong style="color: #1e293b; font-size: 13px;">Tags (${v.tags.length}):</strong>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px;">
+                                                ${v.tags.slice(0, 5).map(tag => `<span style="padding: 4px 8px; background: #f0f4ff; border-radius: 12px; font-size: 11px; color: #667eea;">${tag}</span>`).join('')}
+                                                ${v.tags.length > 5 ? `<span style="padding: 4px 8px; color: #64748b; font-size: 11px;">+${v.tags.length - 5} more</span>` : ''}
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                                            <div style="margin-bottom: 8px;">
+                                                <strong style="color: #10b981; font-size: 12px;">✓ Pros:</strong>
+                                                ${v.pros.map(pro => `<p style="color: #64748b; font-size: 12px; margin: 3px 0 0 15px;">• ${pro}</p>`).join('')}
+                                            </div>
+                                            <div>
+                                                <strong style="color: #ef4444; font-size: 12px;">✗ Cons:</strong>
+                                                ${v.cons.map(con => `<p style="color: #64748b; font-size: 12px; margin: 3px 0 0 15px;">• ${con}</p>`).join('')}
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="background: #667eea; color: white; padding: 8px; border-radius: 6px; text-align: center; font-size: 12px; margin-bottom: 10px;">
+                                            <strong>Best For:</strong> ${v.bestFor}
+                                        </div>
+                                        
+                                        <button onclick="selectVariation(${i})" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                                            ✓ Use This Variation
+                                        </button>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                    
+                    variationsResult.style.display = 'block';
+                } else {
+                    throw new Error(res.error || 'Unknown error');
+                }
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            } finally {
+                loading.classList.remove('active');
+            }
+        });
+        
+        async function selectVariation(index) {
+            const variation = currentVariations[index];
+            const loading = document.getElementById('loading');
+            
+            loading.classList.add('active');
+            
+            try {
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: variation.title,
+                        description: variation.description,
+                        category: variation.category,
+                        tags: variation.tags.join(', '),
+                        materials: variation.materials,
+                        price: variation.price,
+                        quantity: variation.quantity,
+                        sku: variation.sku + '-VAR-' + variation.variation
+                    })
+                });
+
+                const res = await response.json();
+
+                if (response.ok) {
+                    alert(`✅ Variation ${variation.variation} saved successfully!\n\nSEO Score: ${res.seoScore}/100\nSaved to Google Sheets ✓\nEmail sent ✓`);
+                    
+                    // Reset form
+                    document.getElementById('abtestForm').reset();
+                    document.getElementById('variations-result').style.display = 'none';
+                } else {
+                    throw new Error(res.error);
+                }
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
     </script>
 </body>
 </html>

@@ -13,6 +13,7 @@ app.use(express.static('.'));
 
 // API endpoints
 app.post('/api/submit', submitHandler);
+app.post('/api/ab-test', require('./api/ab-test'));
 app.get('/api/analytics', require('./api/analytics'));
 app.get('/api/export', require('./api/export'));
 
