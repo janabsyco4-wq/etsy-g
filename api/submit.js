@@ -61,10 +61,11 @@ module.exports = async (req, res) => {
 async function optimizeWithAI(formData) {
     try {
         if (!process.env.GEMINI_API_KEY) {
-            throw new Error('GEMINI_API_KEY not configured');
+            console.log('⚠️  GEMINI_API_KEY not configured, using fallback optimization');
+            return fallbackOptimization(formData);
         }
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
         
         const prompt = `You are an Etsy SEO expert. Optimize this product listing for maximum visibility and sales.
 
@@ -92,7 +93,8 @@ Please provide optimized versions in JSON format:
         // Extract JSON from response
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
-            throw new Error('AI did not return valid JSON');
+            console.log('⚠️  AI response invalid, using fallback');
+            return fallbackOptimization(formData);
         }
         
         const optimized = JSON.parse(jsonMatch[0]);
@@ -109,9 +111,30 @@ Please provide optimized versions in JSON format:
             sku: formData.sku
         };
     } catch (error) {
-        console.error('Gemini API Error:', error);
-        throw new Error('AI optimization failed: ' + error.message);
+        console.error('Gemini API Error:', error.message);
+        console.log('⚠️  Using fallback optimization');
+        return fallbackOptimization(formData);
     }
+}
+
+// Fallback optimization (rule-based)
+function fallbackOptimization(formData) {
+    const title = formData.title.trim();
+    const description = formData.description.trim();
+    const tags = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : [];
+    const materials = formData.materials ? formData.materials.split(',').map(m => m.trim()).filter(m => m) : [];
+    
+    return {
+        title: `${title} - Handmade ${formData.category || 'Product'}`.substring(0, 140),
+        description: `${description}\n\n✨ Features:\n- High quality ${materials.join(', ')}\n- Perfect for gifts\n- Handmade with care\n\n📦 Fast shipping available!`,
+        tags: tags.length > 0 ? tags.slice(0, 13) : ['handmade', formData.category?.toLowerCase() || 'product', 'gift'],
+        materials: materials.length > 0 ? materials : ['handmade'],
+        category: formData.category || 'Home & Living',
+        improvements: 'Basic SEO optimization applied (AI unavailable)',
+        price: formData.price,
+        quantity: formData.quantity,
+        sku: formData.sku
+    };
 }
 
 // Save to Google Sheets
