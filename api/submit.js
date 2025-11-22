@@ -65,7 +65,7 @@ async function optimizeWithAI(formData) {
             return fallbackOptimization(formData);
         }
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
         
         const prompt = `You are an Etsy SEO expert. Optimize this product listing for maximum visibility and sales.
 
