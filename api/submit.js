@@ -65,39 +65,42 @@ async function optimizeWithAI(formData) {
             return fallbackOptimization(formData);
         }
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         
-        const prompt = `You are an Etsy SEO expert. Optimize this product listing for maximum visibility and sales.
+        const prompt = `You are an Etsy SEO expert. Optimize this product listing.
 
-Original Data:
-- Title: ${formData.title}
-- Description: ${formData.description}
-- Category: ${formData.category}
-- Tags: ${formData.tags}
-- Materials: ${formData.materials}
+Original:
+Title: ${formData.title}
+Description: ${formData.description}
+Category: ${formData.category}
+Tags: ${formData.tags}
+Materials: ${formData.materials}
 
-Please provide optimized versions in JSON format:
-{
-  "title": "SEO-optimized title (max 140 chars, include key search terms)",
-  "description": "Compelling, detailed description with SEO keywords, benefits, and usage",
-  "tags": ["tag1", "tag2", ...] (13 relevant tags),
-  "materials": ["material1", "material2", ...],
-  "category": "Best Etsy category path",
-  "improvements": "Brief note on what was improved"
-}`;
+Return ONLY a single JSON object (no array, no markdown):
+{"title":"SEO title max 140 chars","description":"detailed description","tags":["tag1","tag2","tag3"],"materials":["mat1","mat2"],"category":"category","improvements":"what changed"}`;
 
         const result = await model.generateContent(prompt);
         const response = result.response;
-        const text = response.text();
+        let text = response.text();
         
-        // Extract JSON from response
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            console.log('⚠️  AI response invalid, using fallback');
-            return fallbackOptimization(formData);
+        // Remove markdown code blocks
+        text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+        
+        // Try to parse as JSON
+        let optimized;
+        try {
+            const parsed = JSON.parse(text);
+            // If it's an array, take first element
+            optimized = Array.isArray(parsed) ? parsed[0] : parsed;
+        } catch (e) {
+            // Try to extract JSON object
+            const jsonMatch = text.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/);
+            if (!jsonMatch) {
+                console.log('⚠️  AI response invalid, using fallback');
+                return fallbackOptimization(formData);
+            }
+            optimized = JSON.parse(jsonMatch[0]);
         }
-        
-        const optimized = JSON.parse(jsonMatch[0]);
         
         return {
             title: optimized.title,
