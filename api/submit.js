@@ -188,6 +188,86 @@ async function saveToGoogleSheets(originalData, optimizedData) {
         const sheets = google.sheets({ version: 'v4', auth });
         const spreadsheetId = process.env.GOOGLE_SHEET_ID.trim();
         
+        // Check if headers exist, if not create them
+        try {
+            const headerCheck = await sheets.spreadsheets.values.get({
+                spreadsheetId,
+                range: 'Sheet1!A1:R1'
+            });
+            
+            if (!headerCheck.data.values || headerCheck.data.values.length === 0) {
+                // Create headers
+                const headers = [
+                    'Timestamp',
+                    'Original Title',
+                    'Optimized Title',
+                    'Original Description',
+                    'Optimized Description',
+                    'Original Category',
+                    'Optimized Category',
+                    'Original Tags',
+                    'Optimized Tags',
+                    'Original Materials',
+                    'Optimized Materials',
+                    'Price',
+                    'Quantity',
+                    'SKU',
+                    'AI Improvements',
+                    'SEO Score',
+                    'Keyword Suggestions',
+                    'Market Insights'
+                ];
+                
+                await sheets.spreadsheets.values.update({
+                    spreadsheetId,
+                    range: 'Sheet1!A1:R1',
+                    valueInputOption: 'RAW',
+                    resource: {
+                        values: [headers]
+                    }
+                });
+                
+                // Format headers (bold, background color)
+                await sheets.spreadsheets.batchUpdate({
+                    spreadsheetId,
+                    resource: {
+                        requests: [{
+                            repeatCell: {
+                                range: {
+                                    sheetId: 0,
+                                    startRowIndex: 0,
+                                    endRowIndex: 1
+                                },
+                                cell: {
+                                    userEnteredFormat: {
+                                        backgroundColor: {
+                                            red: 0.4,
+                                            green: 0.43,
+                                            blue: 0.95
+                                        },
+                                        textFormat: {
+                                            foregroundColor: {
+                                                red: 1.0,
+                                                green: 1.0,
+                                                blue: 1.0
+                                            },
+                                            fontSize: 11,
+                                            bold: true
+                                        }
+                                    }
+                                },
+                                fields: 'userEnteredFormat(backgroundColor,textFormat)'
+                            }
+                        }]
+                    }
+                });
+                
+                console.log('✅ Headers created and formatted');
+            }
+        } catch (error) {
+            console.log('Header check/creation skipped:', error.message);
+        }
+        
         // Prepare row data with new columns
         const row = [
             new Date().toISOString(),
